@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/heat-fleet-oil-client-demo'),
+      dir: require('path').join(__dirname, './coverage/ngv'),
       subdir: '.',
       reporters: [
         { type: 'html' },

@@ -13,8 +13,10 @@ import { FeatureCollection, GeoJSON } from 'geojson';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class MapComponent implements OnChanges, OnDestroy {
   @Input() data: any;
+  @Input() loaded: any;
+
   private borders: GeoJSON | any;
 
   private map: Map | any;
@@ -59,10 +61,9 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.borders.addTo(map);
     map.fitBounds(this.borders.getBounds());
   }
-  ngAfterViewInit(): void {
-    this.initMap();
-  }
+
   ngOnChanges(): void {
+    if (this.loaded && !this.map) this.initMap();
     this.makePolygons(this.data, this.map);
   }
   ngOnDestroy(): void {
