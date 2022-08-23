@@ -42,7 +42,7 @@ export class MapComponent implements OnChanges, OnDestroy {
     };
     // add geojson features data in collection
     for (const obj of res) {
-      const fiture = obj.geojson;
+      const fiture = JSON.parse(obj.geojson);
       fiture.properties = obj.min_price;
       collection.features.push(fiture);
     }
