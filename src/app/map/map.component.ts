@@ -1,19 +1,22 @@
-import { Component, AfterViewInit, OnChanges, Input } from '@angular/core';
-import { map, tileLayer, geoJSON, Map, TileLayer, popup } from 'leaflet';
-import { FeatureCollection } from 'geojson';
+import {
+  Component,
+  AfterViewInit,
+  OnChanges,
+  OnDestroy,
+  Input,
+} from '@angular/core';
+import { map, tileLayer, geoJSON, Map, TileLayer } from 'leaflet';
+import { FeatureCollection, GeoJSON } from 'geojson';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements AfterViewInit, OnChanges {
+export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() data: any;
+  private borders: GeoJSON | any;
 
-  private collection: FeatureCollection = {
-    type: 'FeatureCollection',
-    features: [],
-  };
   private map: Map | any;
 
   private initMap(): void {
@@ -31,12 +34,18 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
   makePolygons(res: any[], map: Map): void {
     if (!res) return undefined;
+    const collection: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [],
+    };
+    // add geojson features data in collection
     for (const obj of res) {
       const fiture = obj.geojson;
       fiture.properties = obj.min_price;
-      this.collection.features.push(fiture);
+      collection.features.push(fiture);
     }
-    const borders = geoJSON(this.collection, {
+    if (this.borders) this.borders.remove();
+    this.borders = geoJSON(collection, {
       onEachFeature: (feature, layer) => {
         layer
           .bindTooltip(`<b>$ ${feature.properties}</b>`, {
@@ -46,13 +55,17 @@ export class MapComponent implements AfterViewInit, OnChanges {
           .openTooltip();
       },
     });
-    borders.addTo(map);
-    map.fitBounds(borders.getBounds());
+
+    this.borders.addTo(map);
+    map.fitBounds(this.borders.getBounds());
   }
   ngAfterViewInit(): void {
     this.initMap();
   }
   ngOnChanges(): void {
     this.makePolygons(this.data, this.map);
+  }
+  ngOnDestroy(): void {
+    this.map.remove();
   }
 }

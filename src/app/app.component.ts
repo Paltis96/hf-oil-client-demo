@@ -7,8 +7,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  lng = -73.951368;
-  lat = 40.716743;
+  lng = -76.951368;
+  lat = 41.716743;
   data: any;
   constructor(private http: HttpClient) {}
 
