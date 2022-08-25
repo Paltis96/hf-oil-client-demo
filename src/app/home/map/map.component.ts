@@ -42,7 +42,7 @@ export class MapComponent implements OnChanges, OnDestroy {
     };
     // add geojson features data in collection
     for (const obj of res) {
-      const fiture = JSON.parse(obj.geojson);
+      const fiture = JSON.parse(obj.geom);
       fiture.properties = obj.min_price;
       collection.features.push(fiture);
     }
@@ -64,7 +64,7 @@ export class MapComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(): void {
     if (this.loaded && !this.map) this.initMap();
-    this.makePolygons(this.data, this.map);
+    if (this.map) this.makePolygons(this.data, this.map);
   }
   ngOnDestroy(): void {
     this.map.remove();
