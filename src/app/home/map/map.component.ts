@@ -12,7 +12,6 @@ export class MapComponent implements OnChanges, OnDestroy {
   @Input() loaded: any;
 
   private borders: GeoJSON | any;
-  private circleArray = [];
   private map: Map | any;
 
   private initMap(): void {
@@ -44,10 +43,7 @@ export class MapComponent implements OnChanges, OnDestroy {
           `
         <div><b>city: </b>${element.city}</div>
         <div><b>zip:  </b>${element.zip}</div>`,
-          {
-            direction: 'top',
-            permanent: false,
-          }
+          { direction: 'top', permanent: false }
         )
         .openTooltip()
         .addTo(map);
@@ -59,7 +55,6 @@ export class MapComponent implements OnChanges, OnDestroy {
           e.target.setStyle({ radius: 7 });
         },
       });
-      this.circleArray.push(circle);
     });
     map.fitBounds(circleBounds);
   }
