@@ -1,7 +1,15 @@
 import { Component, OnChanges, OnDestroy, Input } from '@angular/core';
-import { map, Map, tileLayer, TileLayer, geoJSON, circleMarker } from 'leaflet';
+import {
+  map,
+  Map,
+  layerGroup,
+  tileLayer,
+  TileLayer,
+  geoJSON,
+  marker,
+  icon,
+} from 'leaflet';
 import { FeatureCollection, GeoJSON } from 'geojson';
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -11,8 +19,14 @@ export class MapComponent implements OnChanges, OnDestroy {
   @Input() data: any;
   @Input() loaded: any;
 
-  private borders: GeoJSON | any;
   private map: Map | any;
+  private borders: GeoJSON | any;
+  private cytiesMarkers = layerGroup();
+  private myIcon = icon({
+    iconUrl: 'assets/icon/pin.png',
+    iconSize: [32, 32],
+    tooltipAnchor: [0, -8],
+  });
 
   private initMap(): void {
     this.map = map('map', { center: [39.8282, -98.5795], zoom: 3 });
@@ -28,37 +42,32 @@ export class MapComponent implements OnChanges, OnDestroy {
   }
 
   private makePoint(data: any[], map: Map): void {
+    if (this.cytiesMarkers.getLayers().length > 0)
+      this.cytiesMarkers.clearLayers();
     const circleBounds = [];
+    // Create city markers
     data.forEach((element) => {
       const lng = element.lng;
       const lat = element.lat;
       circleBounds.push([lat, lng]);
-      const circle = circleMarker([lat, lng], {
-        radius: 7,
-        fillOpacity: 1,
-        fillColor: '#3388ff',
-        color: '#fff',
+      const circle = marker([lat, lng], {
+        icon: this.myIcon,
       })
         .bindTooltip(
           `
         <div><b>city: </b>${element.city}</div>
         <div><b>zip:  </b>${element.zip}</div>`,
-          { direction: 'top', permanent: false }
+          { direction: 'top', permanent: true }
         )
-        .openTooltip()
-        .addTo(map);
-      circle.on({
-        mouseover: (e) => {
-          e.target.setStyle({ radius: 10 });
-        },
-        mouseout: (e) => {
-          e.target.setStyle({ radius: 7 });
-        },
-      });
+        .openTooltip();
+      this.cytiesMarkers.addLayer(circle);
     });
+    this.cytiesMarkers.addTo(map);
     map.fitBounds(circleBounds);
   }
   private makePolygons(data: any[], map: Map): void {
+    if (this.borders) this.borders.remove();
+
     const collection: FeatureCollection = {
       type: 'FeatureCollection',
       features: [],
@@ -69,7 +78,6 @@ export class MapComponent implements OnChanges, OnDestroy {
       fiture.properties = element.min_price;
       collection.features.push(fiture);
     });
-    if (this.borders) this.borders.remove();
     this.borders = geoJSON(collection, {
       onEachFeature: (feature, layer) => {
         layer
