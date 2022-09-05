@@ -37,6 +37,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 0.9364630339360601,
+        price: 5.6,
       },
       {
         zip: '11931',
@@ -49,6 +50,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 2.3865918628603153,
+        price: 5,
       },
       {
         zip: '11947',
@@ -61,6 +63,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 4.55817562239446,
+        price: 5.611,
       },
       {
         zip: '11933',
@@ -73,6 +76,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 4.851525502090857,
+        price: 5.611,
       },
       {
         zip: '11970',
@@ -85,6 +89,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 4.872547584077033,
+        price: 5.611,
       },
       {
         zip: '11978',
@@ -97,6 +102,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 6.14998273078397,
+        price: 5.611,
       },
       {
         zip: '11977',
@@ -109,6 +115,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 6.238178434405469,
+        price: 5.611,
       },
       {
         zip: '11948',
@@ -121,6 +128,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 6.410813983958901,
+        price: 5.611,
       },
       {
         zip: '11942',
@@ -133,6 +141,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 6.448917489810187,
+        price: 5.611,
       },
       {
         zip: '11941',
@@ -145,6 +154,7 @@ export class HomePage {
         county_name: 'Suffolk',
         isActive: false,
         dist: 6.617118563112063,
+        price: 5.611,
       },
     ];
   }

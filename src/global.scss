@@ -16,7 +16,7 @@
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "~@ionic/angular/css/padding.css";
@@ -26,3 +26,46 @@
 @import "~@ionic/angular/css/flex-utils.css";
 
 @import "~leaflet/dist/leaflet.css";
+
+.leaflet-tooltip {
+  position: absolute;
+  padding: 6px;
+  background-color: #0e8bde;
+  border: none;
+  border-radius: 5px;
+  color: rgb(255, 255, 255);
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+  &::before {
+    bottom: 0;
+    margin-bottom: -12px;
+    border-top-color: #0e8bde;
+  }
+  &-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  &-title {
+    font-size: 15px;
+    font-weight: 500;
+  }
+  &-content {
+    display: flex;
+    align-items: flex-start;
+    span {
+      font-size: 16px;
+      line-height: 110%;
+      font-weight: 500;
+    }
+    small {
+      font-weight: 500;
+      font-size: 12px;
+      line-height: 110%;
+    }
+  }
+}
