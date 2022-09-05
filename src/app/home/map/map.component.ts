@@ -6,7 +6,7 @@ import {
   tileLayer,
   TileLayer,
   geoJSON,
-  marker,
+  circleMarker,
   icon,
 } from 'leaflet';
 import { FeatureCollection, GeoJSON } from 'geojson';
@@ -62,10 +62,10 @@ export class MapComponent implements OnChanges, OnDestroy {
         parsedPrice[1].substring(0, 2),
         parsedPrice[1].substring(2, 3),
       ];
-      console.log(parsedPrice);
       circleBounds.push([lat, lng]);
-      const circle = marker([lat, lng], {
-        icon: this.myIcon,
+      const circle = circleMarker([lat, lng], {
+        opacity: 0,
+        fillOpacity: 0,
       })
         .bindTooltip(
           `<div class="leaflet-tooltip-wrapper"> 
