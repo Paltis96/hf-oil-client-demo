@@ -7,7 +7,8 @@ import {
   TileLayer,
   geoJSON,
   circleMarker,
-  icon,
+  // Marker
+  // icon,
 } from 'leaflet';
 import { FeatureCollection, GeoJSON } from 'geojson';
 
@@ -23,11 +24,11 @@ export class MapComponent implements OnChanges, OnDestroy {
   private map: Map | any;
   private borders: GeoJSON | any;
   private cytiesMarkers = layerGroup();
-  private myIcon = icon({
-    iconUrl: 'assets/icon/pin.png',
-    iconSize: [32, 32],
-    tooltipAnchor: [0, -8],
-  });
+  // private myIcon = icon({
+  //   iconUrl: 'assets/icon/pin.png',
+  //   iconSize: [32, 32],
+  //   tooltipAnchor: [0, -8],
+  // });
 
   private initMap(): void {
     this.map = map('map', { center: [39.8282, -98.5795], zoom: 3 });
