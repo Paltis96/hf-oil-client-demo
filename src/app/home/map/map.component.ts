@@ -11,6 +11,7 @@ import {
   // icon,
 } from 'leaflet';
 import { FeatureCollection, GeoJSON } from 'geojson';
+import { point, distance, bearingToAzimuth, bearing } from '@turf/turf';
 
 @Component({
   selector: 'app-map',
@@ -24,6 +25,7 @@ export class MapComponent implements OnChanges, OnDestroy {
   private map: Map | any;
   private borders: GeoJSON | any;
   private cytiesMarkers = layerGroup();
+
   // private myIcon = icon({
   //   iconUrl: 'assets/icon/pin.png',
   //   iconSize: [32, 32],
@@ -41,6 +43,32 @@ export class MapComponent implements OnChanges, OnDestroy {
           '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }
     ).addTo(this.map);
+  }
+  private calcDirection(data: any[]) {
+    const matrix = {};
+    const processedData: any[] = [];
+    let direction = '';
+    data.forEach((first) => {
+      const firstPoint = point([first.lng, first.lat]);
+
+      data.forEach((second) => {
+        if (first.zip !== second.zip) {
+          const secondPoint = point([second.lng, second.lat]);
+          const dist = distance(firstPoint, secondPoint, { units: 'miles' });
+          if (dist < 2) {
+            const azimuth = bearingToAzimuth(bearing(firstPoint, secondPoint));
+            if (azimuth >= 270 || azimuth <= 90) {
+              direction = 'bottom';
+            } else if (azimuth >= 90 || azimuth <= 270) {
+              direction = 'top';
+            }
+          } 
+        }
+      });
+
+      processedData.push({ ...first, direction });
+    });
+    return processedData;
   }
 
   private makePoint(data: any[], map: Map): void {
@@ -64,6 +92,7 @@ export class MapComponent implements OnChanges, OnDestroy {
         parsedPrice[1].substring(2, 3),
       ];
       circleBounds.push([lat, lng]);
+      console.log(element.direction);
       const circle = circleMarker([lat, lng], {
         opacity: 0,
         fillOpacity: 0,
@@ -77,7 +106,7 @@ export class MapComponent implements OnChanges, OnDestroy {
                 <small>${parsedPrice[2]}</small>
               </div>
             </div>`,
-          { direction: 'top', permanent: true }
+          { direction: element.direction || 'top', permanent: true }
         )
         .openTooltip();
       this.cytiesMarkers.addLayer(circle);
@@ -114,7 +143,9 @@ export class MapComponent implements OnChanges, OnDestroy {
   ngOnChanges(): void {
     if (this.loaded && !this.map) this.initMap();
     // if (this.map && this.data) this.makePolygons(this.data, this.map);
-    if (this.map && this.data) this.makePoint(this.data, this.map);
+    if (this.map && this.data) {
+      this.makePoint(this.calcDirection(this.data), this.map);
+    }
   }
   ngOnDestroy(): void {
     this.map.remove();

@@ -30,8 +30,9 @@
 @import "~leaflet/dist/leaflet.css";
 
 .leaflet-tooltip {
+  margin: 0;
+  padding: 5px;
   position: absolute;
-  padding: 6px;
   background-color: #0e8bde;
   border: none;
   border-radius: 5px;
@@ -41,10 +42,11 @@
   user-select: none;
   pointer-events: none;
   box-shadow: 0 1px 3px rgb(0 0 0 / 40%);
-  &::before {
-    bottom: 0;
-    margin-bottom: -12px;
+  &-top::before {
     border-top-color: #0e8bde;
+  }
+  &-bottom::before {
+    border-bottom-color: #0e8bde;
   }
   &-wrapper {
     display: flex;

@@ -25,6 +25,7 @@
     "@capacitor/keyboard": "4.0.1",
     "@capacitor/status-bar": "4.0.1",
     "@ionic/angular": "^6.1.9",
+    "@turf/turf": "^6.5.0",
     "autoprefixer": "10.4.5",
     "geojson": "^0.5.0",
     "leaflet": "^1.8.0",
