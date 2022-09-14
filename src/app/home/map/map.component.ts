@@ -67,11 +67,11 @@ export class MapComponent implements OnChanges, OnDestroy {
             } else if (azimuth >= 45 && azimuth <= 135) {
               direction = 'left';
             } else if (azimuth >= 135 && azimuth <= 225) {
-              direction = 'right';
-            } else if (azimuth >= 225 && azimuth <= 315) {
               direction = 'top';
+            } else if (azimuth >= 225 && azimuth <= 315) {
+              direction = 'right';
             }
-            processedData[index].push({ ...first, direction, dist });
+            processedData[index].push({ ...first, direction, azimuth, dist });
           } else {
             direction = 'center';
             processedData[index].push({ ...first, direction, dist });
