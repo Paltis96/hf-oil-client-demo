@@ -73,7 +73,7 @@ export class MapComponent implements OnChanges, OnDestroy {
             }
             processedData[index].push({ ...first, direction, dist });
           } else {
-            direction = 'top';
+            direction = 'center';
             processedData[index].push({ ...first, direction, dist });
           }
         }
