@@ -45,38 +45,64 @@ export class MapComponent implements OnChanges, OnDestroy {
     ).addTo(this.map);
   }
   private calcDirection(data: any[]) {
-    const matrix = {};
-    const processedData: any[] = [];
-    let direction = '';
-    data.forEach((first) => {
-      const firstPoint = point([first.lng, first.lat]);
+    const metresPerPixel =
+      (40075016.686 *
+        Math.abs(Math.cos((this.map.getCenter().lat * Math.PI) / 180))) /
+      Math.pow(2, this.map.getZoom() + 8);
 
+    const processedData: any = [];
+    let direction = '';
+    data.forEach((first, index) => {
+      const firstPoint = point([first.lng, first.lat]);
+      processedData[index] = [];
       data.forEach((second) => {
         if (first.zip !== second.zip) {
           const secondPoint = point([second.lng, second.lat]);
-          const dist = distance(firstPoint, secondPoint, { units: 'miles' });
-          if (dist < 2) {
+          const dist = distance(firstPoint, secondPoint, { units: 'meters' });
+
+          if (dist < metresPerPixel * 100) {
             const azimuth = bearingToAzimuth(bearing(firstPoint, secondPoint));
-            if (azimuth >= 270 || azimuth <= 90) {
+            if (azimuth >= 315 && azimuth <= 45) {
               direction = 'bottom';
-            } else if (azimuth >= 90 || azimuth <= 270) {
+            } else if (azimuth >= 45 && azimuth <= 135) {
+              direction = 'left';
+            } else if (azimuth >= 135 && azimuth <= 225) {
+              direction = 'right';
+            } else if (azimuth >= 225 && azimuth <= 315) {
               direction = 'top';
             }
-          } 
+            processedData[index].push({ ...first, direction, dist });
+          } else {
+            direction = 'top';
+            processedData[index].push({ ...first, direction, dist });
+          }
         }
       });
-
-      processedData.push({ ...first, direction });
     });
-    return processedData;
-  }
 
-  private makePoint(data: any[], map: Map): void {
-    if (this.cytiesMarkers.getLayers().length > 0)
-      this.cytiesMarkers.clearLayers();
+    return processedData.map((element) => {
+      return element.sort(function (a, b) {
+        return a.dist - b.dist;
+      })[0];
+    });
+  }
+  private fitToBoubds = (data: any) => {
     const circleBounds = [];
     // Create city markers
     data.forEach((element) => {
+      const lng = element.lng;
+      const lat = element.lat;
+      circleBounds.push([lat, lng]);
+    });
+    this.map.fitBounds(circleBounds);
+  };
+  private async makePoint(data: any[], map: Map) {
+    if (this.cytiesMarkers.getLayers().length > 0)
+      this.cytiesMarkers.clearLayers();
+
+    const points = this.calcDirection(data);
+    console.log(points);
+    points.forEach((element) => {
       const lng = element.lng;
       const lat = element.lat;
       const price = element.price.toString();
@@ -91,28 +117,26 @@ export class MapComponent implements OnChanges, OnDestroy {
         parsedPrice[1].substring(0, 2),
         parsedPrice[1].substring(2, 3),
       ];
-      circleBounds.push([lat, lng]);
-      console.log(element.direction);
       const circle = circleMarker([lat, lng], {
         opacity: 0,
         fillOpacity: 0,
+        radius: 0,
       })
         .bindTooltip(
           `<div class="leaflet-tooltip-wrapper"> 
-              <div class="leaflet-tooltip-title">${element.city}</div>
-              <div class="leaflet-tooltip-content"> 
-                <small>$</small> 
-                <span>${parsedPrice[0]}.${parsedPrice[1]}</span>
-                <small>${parsedPrice[2]}</small>
-              </div>
-            </div>`,
-          { direction: element.direction || 'top', permanent: true }
+                <div class="leaflet-tooltip-title">${element.city}</div>
+                <div class="leaflet-tooltip-content"> 
+                  <small>$</small> 
+                  <span>${parsedPrice[0]}.${parsedPrice[1]}</span>
+                  <small>${parsedPrice[2]}</small>
+                </div>
+              </div>`,
+          { direction: element.direction, permanent: true }
         )
         .openTooltip();
       this.cytiesMarkers.addLayer(circle);
     });
     this.cytiesMarkers.addTo(map);
-    map.fitBounds(circleBounds);
   }
   private makePolygons(data: any[], map: Map): void {
     if (this.borders) this.borders.remove();
@@ -140,11 +164,14 @@ export class MapComponent implements OnChanges, OnDestroy {
     map.fitBounds(this.borders.getBounds());
   }
 
-  ngOnChanges(): void {
+  async ngOnChanges() {
     if (this.loaded && !this.map) this.initMap();
     // if (this.map && this.data) this.makePolygons(this.data, this.map);
     if (this.map && this.data) {
-      this.makePoint(this.calcDirection(this.data), this.map);
+      this.fitToBoubds(this.data);
+      this.map.on('zoomend', () => {
+        this.makePoint(this.data, this.map);
+      });
     }
   }
   ngOnDestroy(): void {
