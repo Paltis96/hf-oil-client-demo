@@ -56,7 +56,10 @@ export class MapComponent implements OnChanges, OnDestroy {
                   <small>${price[2]}</small>
                 </div>
               </div>`,
-              { direction: this.getDir(props.distMatrix[0]), permanent: true }
+              {
+                direction: this.getDir(props.distMatrix[0]) || 'center',
+                permanent: true,
+              }
             )
             .openTooltip();
         });
@@ -72,6 +75,7 @@ export class MapComponent implements OnChanges, OnDestroy {
   }
   getDir = (data) => {
     const [idx, dist, azimuth] = data;
+
     let direction = '';
     const metresPerPixel =
       (40075016.686 *
@@ -79,7 +83,7 @@ export class MapComponent implements OnChanges, OnDestroy {
       Math.pow(2, this.map.getZoom() + 8);
 
     if (dist < metresPerPixel * 100) {
-      if (azimuth >= 315 && azimuth <= 45) {
+      if (azimuth >= 315 || azimuth <= 45) {
         direction = 'bottom';
       } else if (azimuth >= 45 && azimuth <= 135) {
         direction = 'left';
@@ -88,11 +92,11 @@ export class MapComponent implements OnChanges, OnDestroy {
       } else if (azimuth >= 225 && azimuth <= 315) {
         direction = 'right';
       }
-      return direction;
     } else {
       direction = 'center';
-      return direction;
     }
+
+    return direction;
   };
   getStates(map: Map) {
     this.http.get('assets/us_state.json').subscribe((json: any) => {
@@ -103,9 +107,7 @@ export class MapComponent implements OnChanges, OnDestroy {
   }
   pointsToGeoJson(data: any[]) {
     const pointList = [];
-
     data.forEach((item) => {
-      console.log(item);
       let parsedPrice =
         item.price.toString().indexOf('.') !== -1
           ? item.price.toString().split('.')
@@ -129,19 +131,20 @@ export class MapComponent implements OnChanges, OnDestroy {
       const props = firstFeature.properties;
       const distMatrix = (props.distMatrix = []);
       featureEach(collection, function (secondFeature, secondIndex) {
-        if (firstIndex != secondIndex) {
-          const dist = distance(firstFeature as any, secondFeature as any, {
-            units: 'meters',
-          });
-          const azimuth = bearingToAzimuth(
-            bearing(firstFeature as any, secondFeature as any)
-          );
-          distMatrix.push([secondIndex, dist, azimuth]);
-        }
+        const dist = distance(firstFeature as any, secondFeature as any, {
+          units: 'meters',
+        });
+        const azimuth = bearingToAzimuth(
+          bearing(firstFeature as any, secondFeature as any)
+        );
+        distMatrix.push([secondIndex, dist, azimuth]);
       });
 
-      distMatrix.sort(function (a, b) {
+      distMatrix.sort((a, b) => {
         return a[1] - b[1];
+      });
+      props.distMatrix = distMatrix.filter((item) => {
+        return item[1] != 0;
       });
     });
     return collection;
