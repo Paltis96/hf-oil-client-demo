@@ -17,7 +17,7 @@ import {
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnChanges, OnDestroy {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   @Input() data: any;
   @Input() loaded: any;
@@ -29,11 +29,11 @@ export class MapComponent implements OnChanges, OnDestroy {
   private tooltips: FeatureCollection | any;
 
   initMap(): void {
-    this.map = map(this.uid, { center: [39.8282, -98.5795], zoom: 3 });
+    this.map = map(this.uid, { center: [39.8282, -98.5795], zoom: 3, maxZoom: 14 });
     const tiles: TileLayer = tileLayer(
       'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       {
-        maxZoom: 18,
+        maxZoom: 14,
         minZoom: 3,
         attribution:
           '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -57,7 +57,7 @@ export class MapComponent implements OnChanges, OnDestroy {
                 </div>
               </div>`,
               {
-                direction: this.getDir(props.distMatrix[0]) || 'center',
+                direction: props.length < 2 ? (this.getDir(props.distMatrix[0]) || 'center') : 'center',
                 permanent: true,
               }
             )
@@ -73,7 +73,9 @@ export class MapComponent implements OnChanges, OnDestroy {
     }).addTo(this.map);
     this.map.fitBounds(this.tooltips.getBounds(), { padding: [50, 50] });
   }
-  getDir = (data) => {
+  getDir = (data: any[]) => {
+    if (data.length < 2) return 'center'
+
     const [idx, dist, azimuth] = data;
 
     let direction = '';
