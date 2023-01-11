@@ -57,7 +57,7 @@ export class MapComponent implements OnChanges, OnDestroy {
                 </div>
               </div>`,
               {
-                direction: props.length < 2 ? (this.getDir(props.distMatrix[0]) || 'center') : 'center',
+                direction: this.data.length >= 2 ? this.getDir(props.distMatrix[0]) : 'center',
                 permanent: true,
               }
             )
@@ -74,7 +74,6 @@ export class MapComponent implements OnChanges, OnDestroy {
     this.map.fitBounds(this.tooltips.getBounds(), { padding: [50, 50] });
   }
   getDir = (data: any[]) => {
-    if (data.length < 2) return 'center'
 
     const [idx, dist, azimuth] = data;
 
